@@ -26,18 +26,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends ConsumerWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   MyHomePage({Key? key}) : super(key: key);
 
-  int _counter = 0;
-
-  void _incrementCounter() {}
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends ConsumerState<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ref.watch(titleProvider)),
+        title: Text(
+          ref.watch(titleProvider),
+        ),
       ),
       body: Center(
         child: Column(
@@ -47,14 +50,14 @@ class MyHomePage extends ConsumerWidget {
               ref.watch(textProvider),
             ),
             Text(
-              '$_counter',
+              ref.watch(countProvider.state).state.toString(),
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => ref.read(countProvider.state).state++,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
