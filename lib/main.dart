@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_count/count_data.dart';
 import 'package:riverpod_count/provider.dart';
+import 'package:riverpod_count/view_model.dart';
 
 void main() {
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: const MyApp(),
     ),
   );
@@ -21,19 +24,34 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: MyHomePage(ViewModel()),
     );
   }
 }
 
 class MyHomePage extends ConsumerStatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  final ViewModel viewModel;
+
+  const MyHomePage(
+    this.viewModel, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
+  late ViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _viewModel = widget.viewModel;
+    _viewModel.setRef(ref);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,16 +68,36 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               ref.watch(textProvider),
             ),
             Text(
-              ref.watch(countProvider.state).state.toString(),
+              _viewModel.count,
               style: Theme.of(context).textTheme.headline4,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FloatingActionButton(
+                  onPressed: _viewModel.onIncrease,
+                  child: const Icon(CupertinoIcons.plus),
+                ),
+                FloatingActionButton(
+                  onPressed: _viewModel.onDecrease,
+                  child: const Icon(CupertinoIcons.minus),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(_viewModel.countUp),
+                Text(_viewModel.countDown),
+              ],
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => ref.read(countProvider.state).state++,
+        onPressed: _viewModel.onReset,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.refresh),
       ),
     );
   }
